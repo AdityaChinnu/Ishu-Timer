@@ -1,0 +1,36 @@
+Ishu Timer App - GitHub Publish Checklist
+=========================================
+
+Before pushing to GitHub Pages:
+
+1. Put any new audio files into:
+   assets/audio/
+
+2. Refresh the audio manifest:
+   - Double-click refresh-audio.bat
+   OR
+   - Run: py .\tools\generate_audio_manifest.py
+
+3. Quick pre-push check:
+   - Double-click prepare-github-push.bat
+   OR
+   - Run: git status
+
+4. Make sure these are included in your commit:
+   - assets/audio/<your files>
+   - assets/audio/audio-manifest.js
+   - any app code changes
+
+5. Commit and push:
+   git add .
+   git commit -m "Update timer app/audio library"
+   git push
+
+6. If using GitHub Pages:
+   - Open repo Settings > Pages
+   - Make sure deployment is enabled
+   - Wait for the site to update after push
+
+Reminder:
+- If you add, remove, or rename audio files in assets/audio,
+  regenerate audio-manifest.js before pushing.

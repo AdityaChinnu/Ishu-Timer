@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ishu's Cute Focus Timer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Quicksand:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <div class="background-blobs" aria-hidden="true">
+      <span class="blob blob-one"></span>
+      <span class="blob blob-two"></span>
+      <span class="blob blob-three"></span>
+    </div>
+
+    <main class="app-shell">
+      <section class="hero-card card">
+        <p class="eyebrow">For your cutie girl 💗</p>
+        <h1>Ishu's Focus Timer</h1>
+        <p class="subtext">
+          A sweet little timer that cheers her on, plays your special audio,
+          and gives points only when she really finishes the cycle.
+        </p>
+      </section>
+
+      <section class="content-grid">
+        <section class="card timer-card">
+          <div class="card-header">
+            <h2>Focus Cycle</h2>
+            <span class="pill" id="timerStateBadge">Ready</span>
+          </div>
+
+          <div class="timer-display-wrap">
+            <div class="sparkle sparkle-left">✨</div>
+            <div class="timer-display" id="timerDisplay" aria-live="polite">25:00</div>
+            <div class="sparkle sparkle-right">💖</div>
+          </div>
+
+          <div class="timer-settings">
+            <label>
+              <span>Minutes</span>
+              <input id="minutesInput" type="number" min="0" max="180" value="25" />
+            </label>
+            <label>
+              <span>Seconds</span>
+              <input id="secondsInput" type="number" min="0" max="59" value="0" />
+            </label>
+            <label>
+              <span>Points / Cycle</span>
+              <input id="pointsInput" type="number" min="1" max="1000" value="10" />
+            </label>
+          </div>
+
+          <div class="controls">
+            <button id="startPauseButton" class="btn btn-primary">Start</button>
+            <button id="resetButton" class="btn btn-secondary">Reset</button>
+          </div>
+
+          <div class="status-panel">
+            <p id="encouragementText" class="encouragement">
+              Ready for a lovely focused session? 🌸
+            </p>
+          </div>
+        </section>
+
+        <section class="card stats-card">
+          <div class="card-header">
+            <h2>Sweet Progress</h2>
+            <span class="pill accent">Saved locally</span>
+          </div>
+
+          <div class="stats-grid">
+            <article class="stat-box">
+              <span class="stat-label">Points</span>
+              <strong id="pointsValue">0</strong>
+            </article>
+            <article class="stat-box">
+              <span class="stat-label">Completed Cycles</span>
+              <strong id="cyclesValue">0</strong>
+            </article>
+            <article class="stat-box">
+              <span class="stat-label">Current Reward</span>
+              <strong id="rewardValue">10 pts</strong>
+            </article>
+          </div>
+
+          <div class="history-box">
+            <h3>Last Celebration</h3>
+            <p id="lastResultText">No cycle completed yet. Rooting for her! 🫶</p>
+          </div>
+
+          <button id="resetStatsButton" class="btn btn-danger">Reset Points & Cycles</button>
+        </section>
+
+        <section class="card pages-card">
+          <div class="card-header">
+            <h2>Pages Tracker</h2>
+            <span class="pill soft">Study boost</span>
+          </div>
+
+          <div class="pages-tracker-box">
+            <p class="pages-caption">Pages completed so far 📚</p>
+            <strong id="pagesValue" class="pages-value">0</strong>
+            <button id="addPageButton" class="btn btn-primary pages-button" type="button">+ Add Page</button>
+          </div>
+        </section>
+
+        <section class="card side-card">
+          <div class="card-header">
+            <h2>Audio Love Box</h2>
+            <span class="pill soft">Loop Selected</span>
+          </div>
+
+          <p class="file-name" id="audioLibraryInfo">Checking bundled audio library...</p>
+
+          <label class="mute-toggle">
+            <input id="silentModeInput" type="checkbox" />
+            <span>Silent mode — no audio when the timer ends</span>
+          </label>
+
+          <label class="file-picker" for="audioSelect">
+            <span>Choose audio from the app folder</span>
+            <select id="audioSelect"></select>
+          </label>
+
+          <p class="file-name" id="audioFileName">Select an audio to preview and loop when the timer ends.</p>
+          <p class="helper-text">
+            The app loads all bundled audio files from the designated <strong>assets/audio</strong> folder.
+            The selected audio will loop continuously when the timer finishes, unless Silent mode is turned on.
+          </p>
+
+          <div class="audio-buttons">
+            <button id="testAudioButton" class="btn btn-secondary">Preview Selected Audio</button>
+            <button id="stopAudioButton" class="btn btn-ghost">Stop Audio</button>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <div id="successModal" class="modal hidden" aria-hidden="true" role="dialog" aria-modal="true">
+      <div class="modal-backdrop"></div>
+      <div class="modal-card">
+        <div class="modal-emoji">🎀</div>
+        <h2>Timer finished!</h2>
+        <p>Did she complete this focus cycle successfully?</p>
+        <div class="modal-actions">
+          <button id="successYesButton" class="btn btn-primary">Yes, she did 💕</button>
+          <button id="successNoButton" class="btn btn-secondary">Not this time</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="./assets/audio/audio-manifest.js"></script>
+    <script src="./script.js"></script>
+  </body>
+</html>
