@@ -10,6 +10,7 @@ A cute, local timer app for desktop use in the browser.
 - Loads all bundled audio from the designated `assets/audio` folder
 - Lets you choose exactly which audio should play
 - Selected audio loops continuously when the timer finishes
+- Plays selected audio first, then shows Yes/No-specific result media after the answer is selected
 - Silent mode if you do not want any audio at all
 - Fallback chime if no audio clip is selected
 - Local persistence using `localStorage` for points, cycles, and settings
@@ -25,6 +26,9 @@ A cute, local timer app for desktop use in the browser.
 - `publish-checklist.txt` - quick checklist before pushing to GitHub
 - `assets/audio/` - bundled audio clips loaded into the in-app selector
 - `assets/audio/audio-manifest.js` - generated list of bundled audio clips
+- `assets/celebration-media/Yes/` - random images/videos shown after clicking Yes
+- `assets/celebration-media/No/` - random images/videos shown after clicking No
+- `assets/celebration-media/celebration-manifest.js` - generated list of Yes/No result visuals
 - `tools/generate_audio_manifest.py` - refreshes the audio manifest after adding audio files
 - `tools/prepare_audio_library.py` - converts media files in `assets/media/` into audio files in `assets/audio/`
 
@@ -58,21 +62,24 @@ http://localhost:8000
 4. In GitHub, open **Settings > Pages** and ensure the source is **GitHub Actions** if prompted.
 5. Wait for the Pages deployment workflow to finish, then open the published site.
 
-## Adding more audio files later
+## Adding more audio files or result visuals later
 
 1. Copy your new audio files into `assets/audio/`.
-2. Run:
+2. Copy any small images or short videos into:
+   - `assets/celebration-media/Yes/` for successful cycle media
+   - `assets/celebration-media/No/` for unsuccessful cycle media
+3. Run:
 
 ```powershell
 py .\tools\generate_audio_manifest.py
 ```
 
-3. Refresh the app or re-upload the updated files to GitHub.
+4. Refresh the app or re-upload the updated files to GitHub.
 
 ### Easier helper options
 
-- Double-click `refresh-audio.bat` to regenerate the audio manifest
-- Double-click `prepare-github-push.bat` to regenerate the manifest and check git status before pushing
+- Double-click `refresh-audio.bat` to regenerate both manifests
+- Double-click `prepare-github-push.bat` to regenerate manifests and check git status before pushing
 
 ## Converting videos or mixed media into audio
 
@@ -87,3 +94,7 @@ This converts supported media into `.mp3` files in `assets/audio/` and updates t
 ## Audio note
 
 The app loads all bundled audio files from `assets/audio/` using the generated manifest. Choose one in the UI, preview it, and that selected audio will loop when the timer finishes unless Silent mode is enabled.
+
+## Result visual note
+
+When the timer ends, the selected audio plays first while the Yes/No question is shown. After choosing Yes or No, the app stops the timer audio and randomly shows a matching image/video from `assets/celebration-media/Yes/` or `assets/celebration-media/No/`.

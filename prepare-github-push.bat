@@ -5,7 +5,7 @@ cd /d "%~dp0"
 set "EXIT_CODE=0"
 
 echo.
-echo [1/2] Refreshing audio manifest...
+echo [1/2] Refreshing media manifests...
 py ".\tools\generate_audio_manifest.py"
 if errorlevel 1 (
   set "EXIT_CODE=1"

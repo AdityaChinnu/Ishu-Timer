@@ -151,6 +151,19 @@
             <button id="testAudioButton" class="btn btn-secondary">Preview Selected Audio</button>
             <button id="stopAudioButton" class="btn btn-ghost">Stop Audio</button>
           </div>
+
+          <div class="celebration-settings">
+            <div class="card-header mini-header">
+              <h3>Result Media</h3>
+              <span class="pill soft">Yes / No</span>
+            </div>
+
+            <p class="file-name" id="celebrationLibraryInfo">Checking celebration media library...</p>
+            <p class="helper-text" id="celebrationMediaText">
+              After choosing <strong>Yes</strong> or <strong>No</strong>, the app will show a random image or short video from
+              <strong>assets/celebration-media/Yes</strong> or <strong>assets/celebration-media/No</strong>.
+            </p>
+          </div>
         </section>
       </section>
     </main>
@@ -158,17 +171,32 @@
     <div id="successModal" class="modal hidden" aria-hidden="true" role="dialog" aria-modal="true">
       <div class="modal-backdrop"></div>
       <div class="modal-card">
-        <div class="modal-emoji">🎀</div>
-        <h2>Timer finished!</h2>
-        <p>Did she complete this focus cycle successfully?</p>
-        <div class="modal-actions">
-          <button id="successYesButton" class="btn btn-primary">Yes, she did 💕</button>
-          <button id="successNoButton" class="btn btn-secondary">Not this time</button>
+        <div id="successQuestionView">
+          <div class="modal-emoji">🎀</div>
+          <h2>Timer finished!</h2>
+          <p>Did she complete this focus cycle successfully?</p>
+          <div class="modal-actions">
+            <button id="successYesButton" class="btn btn-primary">Yes, she did 💕</button>
+            <button id="successNoButton" class="btn btn-secondary">Not this time</button>
+          </div>
+        </div>
+
+        <div id="resultMediaView" class="hidden" aria-hidden="true">
+          <div id="celebrationMediaContainer" class="celebration-media hidden" aria-hidden="true">
+            <img id="celebrationImage" class="celebration-image hidden" alt="Celebration visual" />
+            <video id="celebrationVideo" class="celebration-video hidden" playsinline muted loop preload="metadata"></video>
+          </div>
+          <h2 id="resultMediaTitle">A little surprise 💖</h2>
+          <p id="resultMediaCaption">Here's something special just for this moment.</p>
+          <div class="modal-actions centered">
+            <button id="closeResultMediaButton" class="btn btn-primary">Close</button>
+          </div>
         </div>
       </div>
     </div>
 
     <script src="./assets/audio/audio-manifest.js"></script>
+    <script src="./assets/celebration-media/celebration-manifest.js"></script>
     <script src="./script.js"></script>
   </body>
 </html>

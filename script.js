@@ -12,10 +12,14 @@ const state = {
   isRunning: false,
   intervalId: null,
   bundledAudioLibrary: Array.isArray(window.BUNDLED_AUDIO_LIBRARY) ? window.BUNDLED_AUDIO_LIBRARY : [],
+  celebrationMediaLibrary: Array.isArray(window.BUNDLED_CELEBRATION_MEDIA) ? window.BUNDLED_CELEBRATION_MEDIA : [],
   silentMode: false,
   selectedBundledAudioPath: "",
   selectedBundledAudioName: "",
   lastPlayedAudioName: "",
+  lastCelebrationMediaPath: "",
+  lastCelebrationMediaName: "",
+  pendingCycleResult: null,
   audio: null,
 };
 
@@ -41,6 +45,16 @@ const elements = {
   audioFileName: document.getElementById("audioFileName"),
   testAudioButton: document.getElementById("testAudioButton"),
   stopAudioButton: document.getElementById("stopAudioButton"),
+  celebrationLibraryInfo: document.getElementById("celebrationLibraryInfo"),
+  celebrationMediaText: document.getElementById("celebrationMediaText"),
+  celebrationMediaContainer: document.getElementById("celebrationMediaContainer"),
+  celebrationImage: document.getElementById("celebrationImage"),
+  celebrationVideo: document.getElementById("celebrationVideo"),
+  successQuestionView: document.getElementById("successQuestionView"),
+  resultMediaView: document.getElementById("resultMediaView"),
+  resultMediaTitle: document.getElementById("resultMediaTitle"),
+  resultMediaCaption: document.getElementById("resultMediaCaption"),
+  closeResultMediaButton: document.getElementById("closeResultMediaButton"),
   pointsValue: document.getElementById("pointsValue"),
   cyclesValue: document.getElementById("cyclesValue"),
   rewardValue: document.getElementById("rewardValue"),
@@ -124,6 +138,25 @@ function syncInputsFromState() {
 
 function getBundledAudioByPath(path) {
   return state.bundledAudioLibrary.find((item) => item.path === path) || null;
+}
+
+function getRandomCelebrationMedia(resultType) {
+  const filteredByResult = state.celebrationMediaLibrary.filter((item) => item.result === resultType);
+
+  if (filteredByResult.length === 0) {
+    return null;
+  }
+
+  if (filteredByResult.length === 1) {
+    return filteredByResult[0];
+  }
+
+  const filteredLibrary = filteredByResult.filter(
+    (item) => item.path !== state.lastCelebrationMediaPath,
+  );
+  const pool = filteredLibrary.length > 0 ? filteredLibrary : filteredByResult;
+  const randomIndex = Math.floor(Math.random() * pool.length);
+  return pool[randomIndex];
 }
 
 function ensureSelectedBundledAudio() {
@@ -215,6 +248,85 @@ function updateAudioUI() {
   }
 }
 
+function updateCelebrationMediaUI() {
+  const mediaCount = state.celebrationMediaLibrary.length;
+
+  if (mediaCount > 0) {
+    const yesCount = state.celebrationMediaLibrary.filter((item) => item.result === "yes").length;
+    const noCount = state.celebrationMediaLibrary.filter((item) => item.result === "no").length;
+    elements.celebrationLibraryInfo.textContent = `${mediaCount} total result media file${mediaCount === 1 ? "" : "s"} loaded (${yesCount} Yes, ${noCount} No) 🎞️`;
+  } else {
+    elements.celebrationLibraryInfo.textContent = "No result image/video found yet. Add some to assets/celebration-media/Yes or assets/celebration-media/No and refresh manifests.";
+  }
+
+  if (state.lastCelebrationMediaName) {
+    elements.celebrationMediaText.innerHTML = `Last completion visual shown: <strong>${state.lastCelebrationMediaName}</strong>`;
+  } else {
+    elements.celebrationMediaText.innerHTML = "After choosing <strong>Yes</strong> or <strong>No</strong>, the app will show a random image or short video from <strong>assets/celebration-media/Yes</strong> or <strong>assets/celebration-media/No</strong>.";
+  }
+}
+
+function hideCelebrationMedia() {
+  elements.celebrationMediaContainer.classList.add("hidden");
+  elements.celebrationMediaContainer.setAttribute("aria-hidden", "true");
+  elements.celebrationImage.classList.add("hidden");
+  elements.celebrationImage.removeAttribute("src");
+  elements.celebrationVideo.pause();
+  elements.celebrationVideo.classList.add("hidden");
+  elements.celebrationVideo.removeAttribute("src");
+  elements.celebrationVideo.load();
+}
+
+function showQuestionView() {
+  elements.successQuestionView.classList.remove("hidden");
+  elements.resultMediaView.classList.add("hidden");
+  elements.resultMediaView.setAttribute("aria-hidden", "true");
+}
+
+function showResultMediaView() {
+  elements.successQuestionView.classList.add("hidden");
+  elements.resultMediaView.classList.remove("hidden");
+  elements.resultMediaView.setAttribute("aria-hidden", "false");
+}
+
+function renderCelebrationMedia(resultType) {
+  hideCelebrationMedia();
+  const selectedMedia = getRandomCelebrationMedia(resultType);
+
+  if (!selectedMedia) {
+    elements.resultMediaTitle.textContent = resultType === "yes" ? "Yay, love! 💖" : "It’s okay, sweetheart 🌷";
+    elements.resultMediaCaption.textContent = resultType === "yes"
+      ? "No Yes-media found yet, but the points were still updated beautifully."
+      : "No No-media found yet, but tomorrow is another lovely chance.";
+    updateCelebrationMediaUI();
+    showResultMediaView();
+    return;
+  }
+
+  state.lastCelebrationMediaPath = selectedMedia.path;
+  state.lastCelebrationMediaName = selectedMedia.name;
+  updateCelebrationMediaUI();
+  elements.resultMediaTitle.textContent = resultType === "yes" ? "Yay, love! 💖" : "It’s okay, sweetheart 🌷";
+  elements.resultMediaCaption.textContent = `Showing: ${selectedMedia.name}`;
+  showResultMediaView();
+
+  const mediaPath = encodeURI(selectedMedia.path);
+  elements.celebrationMediaContainer.classList.remove("hidden");
+  elements.celebrationMediaContainer.setAttribute("aria-hidden", "false");
+
+  if (selectedMedia.type === "video") {
+    elements.celebrationVideo.src = mediaPath;
+    elements.celebrationVideo.classList.remove("hidden");
+    elements.celebrationVideo.play().catch((error) => {
+      console.warn("Celebration video could not autoplay.", error);
+    });
+    return;
+  }
+
+  elements.celebrationImage.src = mediaPath;
+  elements.celebrationImage.classList.remove("hidden");
+}
+
 function getConfiguredDuration() {
   const minutes = clampNumber(Number(elements.minutesInput.value) || 0, 0, 180);
   const seconds = clampNumber(Number(elements.secondsInput.value) || 0, 0, 59);
@@ -247,11 +359,16 @@ function stopTimer() {
 }
 
 function showSuccessModal() {
+  state.pendingCycleResult = null;
+  showQuestionView();
+  hideCelebrationMedia();
   elements.successModal.classList.remove("hidden");
   elements.successModal.setAttribute("aria-hidden", "false");
 }
 
 function hideSuccessModal() {
+  hideCelebrationMedia();
+  state.pendingCycleResult = null;
   elements.successModal.classList.add("hidden");
   elements.successModal.setAttribute("aria-hidden", "true");
 }
@@ -403,6 +520,11 @@ function stopAudioPlayback() {
   updateAudioUI();
 }
 
+function closeResultMedia() {
+  hideSuccessModal();
+  resetAfterCompletion();
+}
+
 function handleSilentModeChange(event) {
   state.silentMode = event.target.checked;
   saveState();
@@ -411,7 +533,6 @@ function handleSilentModeChange(event) {
 
 function completeCycleSucceeded() {
   stopAudioPlayback();
-  hideSuccessModal();
   state.totalPoints += state.pointsPerCycle;
   state.completedCycles += 1;
   state.lastResultText = `Completed at ${new Date().toLocaleTimeString([], {
@@ -420,19 +541,18 @@ function completeCycleSucceeded() {
   })} — earned ${state.pointsPerCycle} sweet points 💖`;
   saveState();
   updateStatsUI();
-  resetAfterCompletion();
+  renderCelebrationMedia("yes");
 }
 
 function completeCycleFailed() {
   stopAudioPlayback();
-  hideSuccessModal();
   state.lastResultText = `Timer ended at ${new Date().toLocaleTimeString([], {
     hour: "2-digit",
     minute: "2-digit",
   })}, but no points were added this time 🌷`;
   saveState();
   updateStatsUI();
-  resetAfterCompletion();
+  renderCelebrationMedia("no");
 }
 
 function resetStats() {
@@ -481,6 +601,7 @@ function bindEvents() {
   elements.stopAudioButton.addEventListener("click", stopAudioPlayback);
   elements.successYesButton.addEventListener("click", completeCycleSucceeded);
   elements.successNoButton.addEventListener("click", completeCycleFailed);
+  elements.closeResultMediaButton.addEventListener("click", closeResultMedia);
   elements.addPageButton.addEventListener("click", addPage);
   elements.removePageButton.addEventListener("click", removePage);
   elements.addQuestionButton.addEventListener("click", addQuestion);
@@ -489,7 +610,11 @@ function bindEvents() {
 
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape" && !elements.successModal.classList.contains("hidden")) {
-      completeCycleFailed();
+      if (!elements.resultMediaView.classList.contains("hidden")) {
+        closeResultMedia();
+      } else {
+        completeCycleFailed();
+      }
     }
   });
 }
@@ -502,6 +627,7 @@ function init() {
   updateTimerUI();
   updateStatsUI();
   updateAudioUI();
+  updateCelebrationMediaUI();
   bindEvents();
 }
 
