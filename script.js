@@ -7,6 +7,7 @@ const state = {
   totalPoints: 0,
   completedCycles: 0,
   pagesCompleted: 0,
+  questionsCompleted: 0,
   lastResultText: "No cycle completed yet. Rooting for her! 🫶",
   isRunning: false,
   intervalId: null,
@@ -45,6 +46,10 @@ const elements = {
   rewardValue: document.getElementById("rewardValue"),
   pagesValue: document.getElementById("pagesValue"),
   addPageButton: document.getElementById("addPageButton"),
+  removePageButton: document.getElementById("removePageButton"),
+  questionsValue: document.getElementById("questionsValue"),
+  addQuestionButton: document.getElementById("addQuestionButton"),
+  removeQuestionButton: document.getElementById("removeQuestionButton"),
   lastResultText: document.getElementById("lastResultText"),
   resetStatsButton: document.getElementById("resetStatsButton"),
   successModal: document.getElementById("successModal"),
@@ -81,6 +86,7 @@ function loadState() {
     state.totalPoints = Math.max(Number(parsed.totalPoints) || 0, 0);
     state.completedCycles = Math.max(Number(parsed.completedCycles) || 0, 0);
     state.pagesCompleted = Math.max(Number(parsed.pagesCompleted) || 0, 0);
+    state.questionsCompleted = Math.max(Number(parsed.questionsCompleted) || 0, 0);
     state.lastResultText = parsed.lastResultText || state.lastResultText;
     state.silentMode = Boolean(parsed.silentMode);
     state.selectedBundledAudioPath = parsed.selectedBundledAudioPath || "";
@@ -100,6 +106,7 @@ function saveState() {
     totalPoints: state.totalPoints,
     completedCycles: state.completedCycles,
     pagesCompleted: state.pagesCompleted,
+    questionsCompleted: state.questionsCompleted,
     lastResultText: state.lastResultText,
     silentMode: state.silentMode,
     selectedBundledAudioPath: state.selectedBundledAudioPath,
@@ -166,6 +173,7 @@ function updateStatsUI() {
   elements.cyclesValue.textContent = state.completedCycles;
   elements.rewardValue.textContent = `${state.pointsPerCycle} pts`;
   elements.pagesValue.textContent = state.pagesCompleted;
+  elements.questionsValue.textContent = state.questionsCompleted;
   elements.lastResultText.textContent = state.lastResultText;
 }
 
@@ -431,6 +439,7 @@ function resetStats() {
   state.totalPoints = 0;
   state.completedCycles = 0;
   state.pagesCompleted = 0;
+  state.questionsCompleted = 0;
   state.lastResultText = "Stats reset. Fresh start, same cuteness 💞";
   saveState();
   updateStatsUI();
@@ -438,6 +447,24 @@ function resetStats() {
 
 function addPage() {
   state.pagesCompleted += 1;
+  saveState();
+  updateStatsUI();
+}
+
+function removePage() {
+  state.pagesCompleted = Math.max(0, state.pagesCompleted - 1);
+  saveState();
+  updateStatsUI();
+}
+
+function addQuestion() {
+  state.questionsCompleted += 1;
+  saveState();
+  updateStatsUI();
+}
+
+function removeQuestion() {
+  state.questionsCompleted = Math.max(0, state.questionsCompleted - 1);
   saveState();
   updateStatsUI();
 }
@@ -455,6 +482,9 @@ function bindEvents() {
   elements.successYesButton.addEventListener("click", completeCycleSucceeded);
   elements.successNoButton.addEventListener("click", completeCycleFailed);
   elements.addPageButton.addEventListener("click", addPage);
+  elements.removePageButton.addEventListener("click", removePage);
+  elements.addQuestionButton.addEventListener("click", addQuestion);
+  elements.removeQuestionButton.addEventListener("click", removeQuestion);
   elements.resetStatsButton.addEventListener("click", resetStats);
 
   document.addEventListener("keydown", (event) => {

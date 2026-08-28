@@ -387,6 +387,10 @@ h1 {
   border: 1px solid rgba(140, 124, 244, 0.14);
 }
 
+.question-box {
+  margin-top: 16px;
+}
+
 .pages-caption {
   margin: 0;
   color: var(--text-soft);
@@ -401,6 +405,14 @@ h1 {
 
 .pages-button {
   min-width: 180px;
+}
+
+.tracker-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
 }
 
 .modal {
